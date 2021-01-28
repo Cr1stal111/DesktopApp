@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project name="pow" default="run">
+    <property name="src" value="src" />
+    <property name="build" value="build" />
+    <property name="main.build.dir" value="${build}/main" />
+    <property name="main.build.dir.classes" value="${main.build.dir}/classes" />
+    <property name="main.src.dir" value="${src}/main/java" />
+    <property name="test.build.dir" value="${build}/test" />
+    <property name="test.build.dir.classes" value="${test.build.dir}/classes" />
+    <property name="test.src.dir" value="${src}/test/java" />
+    <property name="main.class" value="com.palindrome.Palindrome" />
+    <property name="lib" value="lib" />
+
+    <path id="classpath.test">
+        <pathelement location="${lib}/junit-4.12.jar" />
+        <pathelement location="${lib}/hamcrest-core-1.3.jar" />
+        <pathelement location="${main.build.dir.classes}" />
+    </path>
+
+    <target name="compile">
+        <mkdir dir="${main.build.dir.classes}" />
+        <javac srcdir="${main.src.dir}" destdir="${main.build.dir.classes}" includeantruntime="false" />
+    </target>
+
+    <target name="test-compile" depends="compile">
+        <mkdir dir="${test.build.dir.classes}" />
+        <javac srcdir="${test.src.dir}" destdir="${test.build.dir.classes}" includeantruntime="false">
+            <classpath refid="classpath.test" />
+        </javac>
+    </target>
+
+    <target name="test" depends="test-compile">
+        <junit printsummary="on" haltonfailure="yes" fork="true">
+            <classpath>
+                <path refid="classpath.test" />
+                <pathelement location="${test.build.dir.classes}" />
+            </classpath>
+            <formatter type="brief" usefile="false" />
+            <batchtest>
+                <fileset dir="${test.src.dir}" includes="**/*.java" />
+            </batchtest>
+        </junit>
+    </target>
+
+    <target name="package" depends="compile">
+        <jar destfile="${main.build.dir}/${ant.project.name}.jar" basedir="${main.build.dir.classes}">
+            <manifest>
+                <attribute name="Main-Class" value="${main.class}" />
+            </manifest>
+        </jar>
+    </target>
+
+    <target name="run" depends="package">
+        <java jar="${main.build.dir}/${ant.project.name}.jar" fork="true">
+            <arg value="${number}" />
+            <arg value="${power}" />
+        </java>
+    </target>
+
+    <target name="clean">
+        <delete dir="${build}" />
+    </target>
+</project>
